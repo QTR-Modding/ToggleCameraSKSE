@@ -55,10 +55,10 @@ RE::BSEventNotifyControl OurEventSink::ProcessEvent(const RE::MenuOpenCloseEvent
         RE::CameraState::kThirdPerson].get());
     const bool gradualZoomWasInProgress = Modules::Dialogue::listen_gradual_zoom;
 
-    if (event->opening && Modules::Dialogue::Toggle.fix_zoom.enabled && thirdPersonState) {
-        Modules::Dialogue::preDialogueZoomOffset = playerCamera->IsInThirdPerson()
-                                                        ? thirdPersonState->currentZoomOffset
-                                                        : thirdPersonState->savedZoomOffset;
+if (event->opening && Modules::Dialogue::Toggle.fix_zoom.enabled && thirdPersonState) {
+        Modules::Dialogue::preDialogueZoomOffset =
+            playerCamera->IsInThirdPerson() ? thirdPersonState->currentZoomOffset : thirdPersonState->savedZoomOffset;
+
         if (playerCamera->IsInThirdPerson()) {
             thirdPersonState->targetZoomOffset = Modules::Dialogue::Toggle.fix_zoom.zoom_lvl;
         }
@@ -78,6 +78,12 @@ RE::BSEventNotifyControl OurEventSink::ProcessEvent(const RE::MenuOpenCloseEvent
                 Modules::Dialogue::funcToggle();
             }
         }
+    }
+
+    // ONE AND ONLY ONE instant-zoom call
+    if (event->opening && Modules::Dialogue::Toggle.fix_zoom.enabled && Modules::Dialogue::Toggle.fix_zoom.instant &&
+        thirdPersonState) {
+        thirdPersonState->currentZoomOffset = Modules::Dialogue::Toggle.fix_zoom.zoom_lvl;
     }
 
     const bool gradualZoomStartedOnClose = !event->opening && !gradualZoomWasInProgress &&
